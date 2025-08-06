@@ -1,3 +1,4 @@
 aiogram==2.25.1
 tinkoff-investments==0.2.0b115
-aiohttp==3.8.6 --no-binary :all:
+aiohttp==3.8.6
+python-dotenv==1.0.0  # для .env
