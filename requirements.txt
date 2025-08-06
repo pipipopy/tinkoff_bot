@@ -1,2 +1,3 @@
-aiogram==3.0.0b7
-tinkoff-investments>=0.2.0b115
+aiogram==2.25.1
+tinkoff-investments==0.2.0b115
+aiohttp==3.8.6 --no-binary :all:
