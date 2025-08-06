@@ -8,8 +8,8 @@ import traceback
 
 import os
 
-TINKOFF_TOKEN = os.getenv("TINKOFF_TOKEN")
-TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+TINKOFF_TOKEN = "t.gTlvYidRfnqsyM3mhVApSvnklIkhrqjRvFZKzUWldCLTT9kvimBGQLU_XURlB4pzhwTIvPq5-NfxDNuV1dA-Fw"
+TELEGRAM_BOT_TOKEN = "8028781115:AAEJOCq5clBK3Nw9xb6g7KEPTvSf5h6CKUM"
 
 bot = Bot(TELEGRAM_BOT_TOKEN)
 dp = Dispatcher(bot=bot)
