@@ -1,0 +1,2 @@
+aiogram==2.25.1
+tinkoff-investments==0.2.0
