@@ -1,5 +1,5 @@
 from aiogram import Bot, Dispatcher, types, executor
-from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
+from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardButton
 from tinkoff.invest import AsyncClient, PortfolioPosition, InstrumentIdType
 from tinkoff.invest.constants import INVEST_GRPC_API
 from tinkoff.invest.schemas import InstrumentExchangeType
@@ -86,6 +86,12 @@ async def GetInfoBySecurity(ticker: str):
                     "figi" : bond.figi
                 }
 
+def get_inline_keyboard_after_start():
+    markup = InlineKeyboardButton()
+    btn1 = InlineKeyboardButton("Рассчет доходности по тикеру", callback_data="Income_by_ticker")
+    btn2 = InlineKeyboardButton("Рассчет доходности по моим данным", callback_data="Income_by_my_data")
+    markup.add(btn1)
+    markup.add(btn2)
 @dp.message_handler(commands=["start"])
 async def StartMessage(message: types.Message):
     await message.answer("Привет, напиши отправь тикер облигации, а я расчитаю по нему доходность:\n"
