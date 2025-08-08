@@ -1,11 +1,13 @@
 from aiogram import Bot, Dispatcher, types, executor
-from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardButton
+from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardButton, InlineKeyboardMarkup
 from tinkoff.invest import AsyncClient, PortfolioPosition, InstrumentIdType
 from tinkoff.invest.constants import INVEST_GRPC_API
 from tinkoff.invest.schemas import InstrumentExchangeType
 from tinkoff.invest.utils import now
-import traceback
+from aiogram.dispatcher import FSMContext
+from aiogram.dispatcher.filters.state import State, StatesGroup
 
+import traceback
 import os
 
 TINKOFF_TOKEN = "t.gTlvYidRfnqsyM3mhVApSvnklIkhrqjRvFZKzUWldCLTT9kvimBGQLU_XURlB4pzhwTIvPq5-NfxDNuV1dA-Fw"
@@ -13,6 +15,9 @@ TELEGRAM_BOT_TOKEN = "8028781115:AAEJOCq5clBK3Nw9xb6g7KEPTvSf5h6CKUM"
 
 bot = Bot(TELEGRAM_BOT_TOKEN)
 dp = Dispatcher(bot=bot)
+
+class Form(StatesGroup):
+    waiting_for_ticker = State()
 
 async def CountRealIncome(coupon, period, nominal, price, coupons_per_year):
     total_coupons = coupon * period
@@ -87,17 +92,18 @@ async def GetInfoBySecurity(ticker: str):
                 }
 
 def get_inline_keyboard_after_start():
-    markup = InlineKeyboardButton()
+    markup = InlineKeyboardMarkup()
     btn1 = InlineKeyboardButton("Рассчет доходности по тикеру", callback_data="Income_by_ticker")
     btn2 = InlineKeyboardButton("Рассчет доходности по моим данным", callback_data="Income_by_my_data")
     markup.add(btn1)
     markup.add(btn2)
 @dp.message_handler(commands=["start"])
 async def StartMessage(message: types.Message):
-    await message.answer("Привет, напиши отправь тикер облигации, а я расчитаю по нему доходность:\n"
-                         "Приносим прощения, бот плохо работает с теми облигациями, которые имеют НЕ фиксированный купон")
-@dp.message_handler(content_types=types.ContentType.TEXT)
-async def GetTicker(message: types.Message):
+    await message.answer("Привет, нажми на подходящую кнопку ниже\n"
+                         "Приносим прощения, бот плохо работает с теми облигациями, которые имеют НЕ фиксированный купон", 
+                         reply_markup=get_inline_keyboard_after_start())
+@dp.message_handler(state=Form.waiting_for_ticker)
+async def GetTicker(message: types.Message, state: FSMContext):
     ticker = message.text.upper().strip()
     try:
         bond_info = await GetInfoBySecurity(ticker=ticker)
@@ -127,12 +133,18 @@ async def GetTicker(message: types.Message):
                              f"Реальная доходность за все оставшееся время: {total_income:.2f}% ({years:.1f} лет)\n"
                              f"Реальная годовая доходность за год: {annual_income:.2f}%\n"
                              )
-        
-        
-    
+        await state.finish()
+
     except Exception as e:
         await message.answer("Попробуйте ввести тикер еще раз!")
         print("Ошибка:", e)
         traceback.print_exc()
+
+@dp.callback_query_handler()
+async def callback(call: types.CallbackQuery, state: FSMContext):
+    if call.data == "Income_by_ticker":
+        await call.message.answer("Отправь тикер, а я рассчитаю реальную доходность по облигации:")
+        await Form.waiting_for_ticker.set()
+
 if __name__ == "__main__":
     executor.start_polling(dp, skip_updates=True)
