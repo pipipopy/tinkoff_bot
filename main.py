@@ -143,10 +143,12 @@ async def GetTicker(message: types.Message, state: FSMContext):
 
 @dp.callback_query_handler()
 async def callback(call: types.CallbackQuery, state: FSMContext):
+    print(f"Callback received: {call.data}")
+    await call.answer()
     if call.data == "Income_by_ticker":
-        await call.answer()
         await call.message.answer("Отправь тикер, а я рассчитаю реальную доходность по облигации:")
         await Form.waiting_for_ticker.set()
+
 
 if __name__ == "__main__":
     executor.start_polling(dp, skip_updates=True)
