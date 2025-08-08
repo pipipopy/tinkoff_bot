@@ -144,6 +144,7 @@ async def GetTicker(message: types.Message, state: FSMContext):
 @dp.callback_query_handler()
 async def callback(call: types.CallbackQuery, state: FSMContext):
     if call.data == "Income_by_ticker":
+        await call.answer()
         await call.message.answer("Отправь тикер, а я рассчитаю реальную доходность по облигации:")
         await Form.waiting_for_ticker.set()
 
