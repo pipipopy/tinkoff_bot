@@ -97,6 +97,7 @@ def get_inline_keyboard_after_start():
     btn2 = InlineKeyboardButton("Рассчет доходности по моим данным", callback_data="Income_by_my_data")
     markup.add(btn1)
     markup.add(btn2)
+    return markup
 @dp.message_handler(commands=["start"])
 async def StartMessage(message: types.Message):
     await message.answer("Привет, нажми на подходящую кнопку ниже\n"
